@@ -1,3 +1,4 @@
+const SocksProxyAgent = require('socks-proxy-agent');
 const WebSocket = require('ws');
 
 const misc = require('./miscRequests');
@@ -5,6 +6,7 @@ const protocol = require('./protocol');
 
 const quoteSessionGenerator = require('./quote/session');
 const chartSessionGenerator = require('./chart/session');
+const SocksProxy = require("socks-proxy-agent");
 
 /**
  * @typedef {Object} Session
@@ -225,9 +227,13 @@ module.exports = class Client {
   constructor(clientOptions = {}) {
     if (clientOptions.DEBUG) global.TW_DEBUG = clientOptions.DEBUG;
 
+    const proxyUrl = 'socks5://zhizhuipccssdrf-3:vpxkn33a@proxy.zhizhuip.com:5001';
+    const {SocksProxyAgent} = SocksProxy
+    const agent = new SocksProxyAgent(proxyUrl);
     const server = clientOptions.server || 'data';
     this.#ws = new WebSocket(`wss://${server}.tradingview.com/socket.io/websocket?&type=chart`, {
       origin: 'https://s.tradingview.com',
+      agent,
     });
 
     if (clientOptions.token) {
